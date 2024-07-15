@@ -1,8 +1,7 @@
 import {Field, FieldComponentProps} from "@/objects.ts";
+import {ItemType} from "@/types/form.ts";
+import {Dropdown} from "primereact/dropdown";
 import React from "react";
-import {ItemType} from "@/types/form.ts"
-import {useForm, useController, UseControllerProps} from "react-hook-form"
-import {Dropdown} from 'primereact/dropdown';
 
 
 type SelectOptionType = {
@@ -28,14 +27,15 @@ const Render: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
         onUpdateField(updatedField);
     };
     
-    
     return (
         <>
             <article className="form-item">
                 <label>
-                    <Dropdown value={config.value || ""} onChange={handleOnChange} options={config.options}>
-                    
-                    </Dropdown>
+                    <Dropdown
+                        value={config.value || ""}
+                        onChange={handleOnChange}
+                        options={config.options}
+                    > </Dropdown>
                 </label>
                 <div className={"config-item"}>{JSON.stringify(config)}</div>
             </article>
