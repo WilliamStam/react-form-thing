@@ -1,9 +1,3 @@
-Create a `.env.local` file that points to the "api" for vite to proxy through
-
-```text
-VITE_API=http://127.0.0.1:8000
-```
-
 # issues
 
 i cant seem to get the blasted form to update the main config. or its local config even. 

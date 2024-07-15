@@ -12,19 +12,6 @@ export default ({mode}: { mode: string }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
-    server: {
-      // port: 3000,
-      // host: "dsf.localhost",
-      proxy: {
-        // string shorthand
-        
-        "/api": {
-          target: process.env.VITE_API,
-          changeOrigin: true,
-          secure: false,
-          // ws: true,
-        },
-      }
-    }
+    
   })
 }
