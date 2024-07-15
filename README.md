@@ -89,4 +89,6 @@ return React.createElement(Items[block.type].render, {
 
 ----
 
-Each src/items/* defines a item type. that has 2 components. 1 for "render" which will be the normal fill the form in now. and the other is settings that will be in the admin part
+Each src/items/* defines a item type. that has 2 components. 1 for "render" which will be the normal fill the form in now. and the other is settings that will be in the admin part.
+
+they both pretty much do the same thing.. they fill in values onto the config just with different keys basically. 
