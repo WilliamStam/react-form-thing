@@ -1,4 +1,4 @@
-import {FormType} from "@/types/form.ts";
+import {FormType} from "@/objects/forms.ts";
 
 const data = [
     {

@@ -1,12 +1,19 @@
-import {ItemType} from "@/types/form.ts";
+import SelectInput from "@/inputs/SelectInput.tsx";
+import TextInput from "@/inputs/TextInput.tsx";
 import React from "react";
 
+export type InputType = {
+    type: string;
+    [key: string]: any;
+}
+
+
 export interface FieldComponentProps {
-    config: ItemType;
+    config: InputType;
     onUpdateField: any;
 }
 
-export class FieldInit {
+export class InputInit {
     constructor(
         public render: React.FC<FieldComponentProps>,
         public settings: React.FC<FieldComponentProps>,
@@ -19,8 +26,8 @@ export class FieldInit {
     }
 }
 
-export class Field extends FieldInit {
-    constructor(init: FieldInit) {
+export class Input extends InputInit {
+    constructor(init: InputInit) {
         super(
             init.render,
             init.settings,
