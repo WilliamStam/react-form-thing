@@ -27,7 +27,6 @@ const Form = ({id}: {
         }
     };
     
-    
     const textRef = useRef<HTMLTextAreaElement>();
     const handleJsonChange = () => {
         const new_form_value = {...form, ...JSON.parse(textRef.current.value)};
@@ -37,9 +36,7 @@ const Form = ({id}: {
     console.log("fuck you react");
     
     useEffect(() => {
-        // console.log(id);
         fetchForm(id);
-
     }, [id]);
     
     return (
