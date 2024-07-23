@@ -3,9 +3,15 @@ import AdminForm from "@/components/admin/Form.tsx";
 import FormsList from "@/components/FormsList.tsx";
 import React, {useEffect, useState} from "react";
 
+import {library} from '@fortawesome/fontawesome-svg-core'
+import {fas} from '@fortawesome/free-solid-svg-icons'
+import {far} from '@fortawesome/free-regular-svg-icons'
+
+library.add(fas,far)
+
 export default function App() {
-    const [formId, setFormId] = useState<string>("");
-    const [isAdmin, setAdmin] = useState<boolean>(false);
+    const [formId, setFormId] = useState<string>("4");
+    const [isAdmin, setAdmin] = useState<boolean>(true);
     
    
     

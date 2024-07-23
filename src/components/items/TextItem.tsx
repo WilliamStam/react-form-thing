@@ -70,5 +70,5 @@ export default new Item({
     heading: "Text input",
     description: "a simple box to insert a value into",
     hidden: false,
-    icon: ["fas", "font"],
+    icon: "fa-solid fa-font",
 });

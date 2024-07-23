@@ -82,5 +82,5 @@ export default new Item({
     heading: "Select box",
     description: "select from a list of items in a drop down",
     hidden: false,
-    icon: ["far", "square-caret-down"],
+    icon: "fa-regular fa-square-caret-down",
 });

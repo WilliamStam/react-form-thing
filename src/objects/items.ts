@@ -19,7 +19,7 @@ export class ItemInit {
         public heading: string,
         public description: string,
         public hidden: boolean,
-        public icon: string[],
+        public icon: string,
     ) {
     }
 }

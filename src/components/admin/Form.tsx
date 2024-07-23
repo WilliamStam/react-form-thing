@@ -10,11 +10,17 @@ import {TabView, TabPanel} from 'primereact/tabview';
 import FormPanel from "@/components/admin/panels/FormPanel.tsx";
 import FormsPanel from "@/components/admin/panels/FormsPanel.tsx";
 import ItemsPanel from "@/components/admin/panels/ItemsPanel.tsx";
+import {useDroppable} from "@dnd-kit/core";
+
 
 const Form = ({id}: {
     id: string,
 }) => {
     const [form, setForm] = useState<FormType>();
+    const [panelIndex, setPanelIndex] = useState<number>(1);
+    const {isOver, setNodeRef} = useDroppable({
+        id: "wtf"
+    });
     
     const fetchForm = async (id: string) => {
         await getForm(id).then((formData) => setForm(formData));
@@ -39,6 +45,7 @@ const Form = ({id}: {
     
     
     
+    
     useEffect(() => {
         console.log(id)
         fetchForm(id)
@@ -48,7 +55,7 @@ const Form = ({id}: {
         <>
             <section className={"form-admin"}>
                 <nav>
-                    <TabView>
+                    <TabView activeIndex={panelIndex} onTabChange={(e) => setPanelIndex(e.index)}>
                         <TabPanel header="Form">
                             <FormPanel form={form} setForm={setForm}></FormPanel>
                         </TabPanel>
@@ -60,22 +67,24 @@ const Form = ({id}: {
                         </TabPanel>
                     </TabView>
                 </nav>
-                <main>
-                    {form?.config.map((block, index) => {
-                        // component does exist
-                        if (typeof items[block.type] !== "undefined") {
-                            return React.createElement(items[block.type].render, {
-                                key: index,
-                                config: block,
-                                onUpdateField: (updatedField: ItemType) => handleFieldUpdate(updatedField, index)
-                            });
-                        }
-                        // component doesn't exist yet
-                        return React.createElement(
-                            () => <div>The component {block.type} was not found.</div>,
-                            {key: index}
-                        );
-                    })}
+                <main className={"mx-4"} ref={setNodeRef}>
+                        {form?.config.map((block, index) => {
+                            // component does exist
+                            if (typeof items[block.type] !== "undefined") {
+                                return React.createElement(items[block.type].render, {
+                                    key: index,
+                                    config: block,
+                                    onUpdateField: (updatedField: ItemType) => handleFieldUpdate(updatedField, index)
+                                });
+                            }
+                            // component doesn't exist yet
+                            return React.createElement(
+                                () => <div>The component {block.type} was not found.</div>,
+                                {key: index}
+                            );
+                        })}
+                    
+                    
                 </main>
                 <footer>
                     <div>

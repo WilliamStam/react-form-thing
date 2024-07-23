@@ -1,0 +1,36 @@
+
+
+.item-panel-item {
+    border: 1px solid transparent;
+    border-bottom: 1px dotted #CCCCCC;
+    cursor: grab;
+    padding: 0.4rem;
+    background: #FFFFFF;
+    
+    &:hover {
+        background: #F1F1F1;
+        border: 1px solid #CCCCCC;
+    }
+    
+    .item-icon {
+        align-items: center;
+        background: #FFFFFF;
+        border: 1px solid #F1F1F1;
+        color: #CCCCCC;
+        display: flex;
+        font-size: 1.5rem;
+        justify-content: center;
+        width: 3rem;
+        
+    }
+    
+    
+    .item-title {
+        font-weight: bold;
+        margin: 0;
+    }
+    
+    .item-text {
+        font-size: 0.8rem;
+    }
+}
