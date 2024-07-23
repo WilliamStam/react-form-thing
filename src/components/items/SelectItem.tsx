@@ -1,4 +1,4 @@
-import {FieldComponentProps, Input, InputType} from "@/objects/inputs.ts";
+import {FieldComponentProps, Item, ItemType} from "@/objects/items.ts";
 import {Dropdown} from "primereact/dropdown";
 import {InputText} from "primereact/inputtext";
 import React, {useEffect, useState} from "react";
@@ -7,7 +7,7 @@ type SelectOptionType = {
     label: string
 }
 
-export type SelectOptionInput = InputType & {
+export type SelectOptionInput = ItemType & {
     label: string
     value: string
     options: SelectOptionType[]
@@ -75,7 +75,7 @@ const Settings: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
     );
 };
 
-export default new Input({
+export default new Item({
     type: "select",
     render: Render,
     settings: Settings,

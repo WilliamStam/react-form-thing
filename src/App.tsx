@@ -1,19 +1,36 @@
-import Form from "@/components/Form.tsx";
-import {useState} from "react";
+import Form from "@/components/front/Form.tsx";
+import AdminForm from "@/components/admin/Form.tsx";
+import FormsList from "@/components/FormsList.tsx";
+import React, {useEffect, useState} from "react";
 
 export default function App() {
-    const [formId, setFormId] = useState<string>("4");
-    return (
-        <>
-            <div>
-                <Form id={formId}></Form>
-            </div>
-            <button onClick={() => setFormId("1")}>1</button>
-            <button onClick={() => setFormId("2")}>2</button>
-            <button onClick={() => setFormId("3")}>3</button>
-            <button onClick={() => setFormId("4")}>4</button>
-        
-        </>
+    const [formId, setFormId] = useState<string>("");
+    const [isAdmin, setAdmin] = useState<boolean>(false);
     
-    );
+   
+    
+    if (formId){
+        if (isAdmin){
+          return (
+              <>
+              <AdminForm id={formId}></AdminForm>
+                <button onClick={() => setFormId("")}>Cancel</button>
+                <button onClick={() => setAdmin(false)}>front</button>
+          </>
+          )
+        }
+        return (
+            <>
+                <Form id={formId}></Form>
+                <button onClick={()=>setFormId("")}>Cancel</button>
+                <button onClick={()=> setAdmin(true)}>Admin</button>
+            </>
+        )
+    } else {
+        return (
+            <>
+                <FormsList setform={setFormId} ></FormsList>
+            </>
+        )
+    }
 }

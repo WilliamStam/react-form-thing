@@ -1,8 +1,8 @@
 // import TextInput from "@/components/inputs/TextInput.tsx";
 
-import {InputTextarea} from 'primereact/inputtextarea';
-import {InputType} from "@/objects/inputs.ts";
-import Inputs from "@/inputs.ts";
+import {InputTextarea} from "primereact/inputtextarea";
+import {ItemType} from "@/objects/items.ts";
+import items from "@/items.ts";
 import {FormType} from "@/objects/forms.ts";
 import React, {useState, useEffect, useRef} from "react";
 import {getForm} from "@/service.ts";
@@ -13,13 +13,13 @@ const Form = ({id}: {
 }) => {
     const [form, setForm] = useState<FormType>();
     
-    const fetchForm = async (id:string) => {
+    const fetchForm = async (id: string) => {
         await getForm(id).then((formData) => setForm(formData));
-    }
+    };
     
-    const handleFieldUpdate = (updatedField: InputType, index: number) => {
-        if (form){
-            const updatedData: InputType[] = [...form.config];
+    const handleFieldUpdate = (updatedField: ItemType, index: number) => {
+        if (form) {
+            const updatedData: ItemType[] = [...form.config];
             updatedData[index] = updatedField;
             const new_form_value = {...form, config: updatedData};
             // form.config = updatedData
@@ -34,13 +34,13 @@ const Form = ({id}: {
         setForm(new_form_value);
     };
     
+    console.log("fuck you react");
     
-    console.log("fuck you react")
-    
-    useEffect(()=>{
-        console.log(id)
-        fetchForm(id)
-    },[id])
+    useEffect(() => {
+        // console.log(id);
+        fetchForm(id);
+
+    }, [id]);
     
     return (
         <>
@@ -48,11 +48,11 @@ const Form = ({id}: {
             <div>
                 {form?.config.map((block, index) => {
                     // component does exist
-                    if (typeof Inputs[block.type] !== "undefined") {
-                        return React.createElement(Inputs[block.type].render, {
+                    if (typeof items[block.type] !== "undefined") {
+                        return React.createElement(items[block.type].render, {
                             key: index,
                             config: block,
-                            onUpdateField: (updatedField: InputType) => handleFieldUpdate(updatedField, index)
+                            onUpdateField: (updatedField: ItemType) => handleFieldUpdate(updatedField, index)
                         });
                     }
                     // component doesn't exist yet
@@ -63,8 +63,6 @@ const Form = ({id}: {
                 })}
             </div>
             {!form && <div>loading...</div>}
-            
-            
             <div>
                 <InputTextarea
                     style={{
@@ -75,9 +73,7 @@ const Form = ({id}: {
                     ref={textRef}
                     onBlur={handleJsonChange}
                 ></InputTextarea>
-            
             </div>
-        
         </>
     );
 };

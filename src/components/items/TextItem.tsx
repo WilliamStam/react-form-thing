@@ -1,8 +1,8 @@
-import {FieldComponentProps, Input, InputType} from "@/objects/inputs.ts";
+import {FieldComponentProps, Item, ItemType} from "@/objects/items.ts";
 import {InputText} from "primereact/inputtext";
 import React, {useEffect, useState} from "react";
 
-export type TextInputConfig = InputType & {
+export type TextInputConfig = ItemType & {
     label: string
     value: string
 }
@@ -63,7 +63,7 @@ const Settings: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
     );
 };
 
-export default new Input({
+export default new Item({
     type: "text",
     render: Render,
     settings: Settings,
