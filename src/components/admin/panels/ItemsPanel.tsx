@@ -53,6 +53,7 @@ const ItemDraggableInPanel: React.FC<ItemInPanelProps> = ({item}) => {
             position: "absolute",
             transform: `translate3d(${transform?.x}px, ${transform?.y}px, 0)`,
             cursor: "move",
+            zIndex: 1000
         }
         : {
             cursor: "pointer"

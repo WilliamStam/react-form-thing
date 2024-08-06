@@ -1,4 +1,5 @@
 @import "admin/_form_items_panel.scss";
+@import "admin/_admin-form.scss";
 
 body {
 }
@@ -10,9 +11,8 @@ font-size: 4rem;
     font-size:0.7rem;
 }
 .form-item {
-    padding: 1rem;
+    padding: 2rem;
     border-bottom: 1px dotted #ccc;
-    margin-bottom: 1rem;
 }
 
 .form-admin {

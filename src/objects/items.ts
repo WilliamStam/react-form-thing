@@ -1,14 +1,16 @@
 import React from "react";
 
 export type ItemType = {
+    id: string;
     type: string;
     [key: string]: any;
 }
 
+export type HandleFieldOnChangeType = (value: ItemType) => void;
 
 export interface FieldComponentProps {
     config: ItemType;
-    onUpdateField: any;
+    onChange: HandleFieldOnChangeType;
 }
 
 export class ItemInit {
@@ -20,6 +22,7 @@ export class ItemInit {
         public description: string,
         public hidden: boolean,
         public icon: string,
+        public default_config: ItemType,
     ) {
     }
 }
@@ -34,6 +37,7 @@ export class Item extends ItemInit {
             init.description,
             init.hidden,
             init.icon,
+            init.default_config
         );
     }
 }

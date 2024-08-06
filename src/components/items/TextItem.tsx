@@ -1,4 +1,5 @@
 import {FieldComponentProps, Item, ItemType} from "@/objects/items.ts";
+import {nanoid} from "nanoid";
 import {InputText} from "primereact/inputtext";
 import React, {useEffect, useState} from "react";
 
@@ -8,21 +9,18 @@ export type TextInputConfig = ItemType & {
 }
 
 const itemConfig: TextInputConfig = {
+    id: nanoid(),
     type: "text",
     label: "",
     value: "",
 };
 
-const Render: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
-    const [data, setData] = useState<TextInputConfig>({...itemConfig, ...config});
+const Render: React.FC<FieldComponentProps> = ({config, onChange}) => {
     
     const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const updatedData: TextInputConfig = {...data, value: event.target.value};
-        setData(updatedData);
+        const updatedData: TextInputConfig = {...{...itemConfig, ...config}, value: event.target.value};
+        onChange(updatedData);
     };
-    useEffect(() => {
-        onUpdateField(data);
-    }, [data]);
     
     const id = Math.random().toString(36).substring(2, 15);
     
@@ -31,14 +29,17 @@ const Render: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
             <article className="form-item">
                 <div className="flex flex-column gap-2">
                     <label htmlFor={id}>{config.label}</label>
-                    <InputText id={id} value={config.value || ""} onChange={handleOnChange}></InputText>
+                    <InputText
+                        value={config.value || ""}
+                        onChange={handleOnChange}
+                    ></InputText>
                 </div>
                 <div className={"config-item"}>{JSON.stringify(config)}</div>
             </article>
         </>
     );
 };
-const Settings: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
+const Settings: React.FC<FieldComponentProps> = ({config, onChange}) => {
     const [data, setData] = useState<TextInputConfig>({...itemConfig, ...config});
     
     const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +47,7 @@ const Settings: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
         setData(updatedData);
     };
     useEffect(() => {
-        onUpdateField(data);
+        onChange(data);
     }, [data]);
     
     
@@ -71,4 +72,5 @@ export default new Item({
     description: "a simple box to insert a value into",
     hidden: false,
     icon: "fa-solid fa-font",
+    default_config: itemConfig
 });

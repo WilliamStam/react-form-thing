@@ -1,0 +1,30 @@
+.item-admin {
+    position:relative;
+    padding-right:2rem;
+    padding-left:1.5rem;
+    
+    &:hover {
+        background: #FFFFFF;
+        box-shadow: 0 0 1rem #F1F1F1;
+        .item-admin-buttons {
+            display: block;
+        }
+    }
+    
+    .item-admin-buttons {
+        position:absolute;
+        top:0;
+        right:0;
+        display: none;
+        z-index: 1000;
+        width: calc(2rem + 2px);
+        background: #fff;
+        button {
+            padding:0.3rem 1rem;
+            width: 1rem;
+            border-radius: 0;
+            margin-bottom: -1px;
+        }
+    }
+   
+}

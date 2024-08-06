@@ -21,13 +21,16 @@ const FormPanel: React.FC<PanelProps> = ({form, setForm}) => {
             <main className={"panel-body p-4"}>
                 <div className="flex flex-column gap-2">
                     <label htmlFor="label">Form label</label>
-                    <InputText id="label" name="label" value={form?.label || ""} onChange={handleOnChange}></InputText>
+                    <InputText
+                        id="label"
+                        name="label"
+                        value={form?.label || ""}
+                        onChange={handleOnChange}
+                    ></InputText>
                     <small id="label-help">
                         A friendly name for your form
                     </small>
                 </div>
-            
-            
             </main>
         </>
     );

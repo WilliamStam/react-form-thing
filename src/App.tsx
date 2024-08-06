@@ -9,8 +9,10 @@ import {far} from '@fortawesome/free-regular-svg-icons'
 
 library.add(fas,far)
 
+import TestForm from "@/components/testing/Form.tsx"
+
 export default function App() {
-    const [formId, setFormId] = useState<string>("4");
+    const [formId, setFormId] = useState<string>("1");
     const [isAdmin, setAdmin] = useState<boolean>(true);
     
    
@@ -19,7 +21,7 @@ export default function App() {
         if (isAdmin){
           return (
               <>
-              <AdminForm id={formId}></AdminForm>
+              <TestForm id={formId}></TestForm>
                 <button onClick={() => setFormId("")}>Cancel</button>
                 <button onClick={() => setAdmin(false)}>front</button>
           </>

@@ -1,7 +1,9 @@
+import {TextInputConfig} from "@/components/items/TextItem.tsx";
 import {FieldComponentProps, Item, ItemType} from "@/objects/items.ts";
 import {Dropdown} from "primereact/dropdown";
 import {InputText} from "primereact/inputtext";
 import React, {useEffect, useState} from "react";
+import {nanoid} from 'nanoid'
 type SelectOptionType = {
     value: string
     label: string
@@ -13,23 +15,19 @@ export type SelectOptionInput = ItemType & {
     options: SelectOptionType[]
 }
 const itemConfig: SelectOptionInput = {
+    id: nanoid(),
     type: "select",
     label: "",
     value: "",
     options: []
 };
 
-const Render: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
-    const [data, setData] = useState<SelectOptionInput>({...itemConfig, ...config});
+const Render: React.FC<FieldComponentProps> = ({config, onChange}) => {
     
-    const handleOnChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const updatedData: SelectOptionInput = {...data, value: event.target.value};
-        setData(updatedData);
-        
+    const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const updatedData: TextInputConfig = {...{...itemConfig, ...config}, value: event.target.value};
+        onChange(updatedData);
     };
-    useEffect(() => {
-        onUpdateField(data);
-    }, [data]);
     
     return (
         <>
@@ -43,14 +41,14 @@ const Render: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
                         className={'w-full'}
                     > </Dropdown>
                 </label>
-                <div className={"config-item"}>{JSON.stringify(data)}</div>
+                {/* <div className={"config-item"}>{JSON.stringify(data)}</div> */}
             </article>
         
         
         </>
     );
 };
-const Settings: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
+const Settings: React.FC<FieldComponentProps> = ({config, onChange}) => {
     const [data, setData] = useState<SelectOptionInput>({...itemConfig, ...config});
     
     const handleOnChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -58,9 +56,11 @@ const Settings: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
         setData(updatedData);
         
     };
+    
     useEffect(() => {
-        onUpdateField(data);
+        onChange(data);
     }, [data]);
+    
     return (
         <>
             <div>
@@ -70,7 +70,7 @@ const Settings: React.FC<FieldComponentProps> = ({config, onUpdateField}) => {
                     onChange={handleOnChange}
                 ></InputText>
             </div>
-            <div>{JSON.stringify(config)}</div>
+            {/* <div>{JSON.stringify(config)}</div> */}
         </>
     );
 };
@@ -83,4 +83,5 @@ export default new Item({
     description: "select from a list of items in a drop down",
     hidden: false,
     icon: "fa-regular fa-square-caret-down",
+    default_config: itemConfig
 });
