@@ -1,24 +1,31 @@
 import {FormType} from "@/objects/forms.ts";
-import {ItemType} from "@/objects/items.ts";
+import {ItemType, Item} from "@/objects/items.ts";
 import {getForm} from "@/service.ts";
 import {clone_object} from "@/utilities.ts";
-import {nanoid} from "nanoid";
-import {useEffect, useRef, useState} from "react";
-import {useImmer} from "use-immer";
-import {DndContext, DragOverlay} from "@dnd-kit/core";
-import {HandleFormConfigOnChangeType} from "@/objects/forms"
 import {
-    arrayMove,
-    SortableContext,
-    verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+    closestCenter,
+    closestCorners,
+    DndContext,
+    DragOverlay,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from "@dnd-kit/core";
+import {arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy, SortableContext} from "@dnd-kit/sortable";
+import {nanoid} from "nanoid";
+import React, {useEffect, useState, useRef} from "react";
+import Canvas from "./Canvas.tsx";
+import Sidebar from "./Sidebar.tsx";
+import "./style.css";
 
-import Canvas from "./Canvas";
-import Sidebar, {ItemInPanel} from "./Sidebar";
-import "./style.css"
-
-function getData(prop) {
-    return prop?.data?.current ?? {};
+function fixitems(items: ItemType[]) {
+    return items.map((f) => {
+        if (!f?.id) {
+            f["id"] = nanoid();
+        }
+        return f;
+    }) ?? [];
 }
 
 function createSpacer({id}) {
@@ -28,19 +35,46 @@ function createSpacer({id}) {
         title: "spacer",
     };
 }
-function fixitems(items: ItemType[]){
-    return items.map((f) => {
-        if (!f?.id) {
-            f['id'] = nanoid()
-        }
-        return f
-    }) ?? []
-}
+
 export default function Form({id}: {
     id: string,
 }) {
-    console.log("rendering Form")
-    const [form, setForm] = useState<FormType>();
+    const [form, setForm] = useState<Partial<FormType>>();
+    
+    const fetchForm = async (id: string) => {
+        await getForm(id).then((formData) => {
+            if (formData) {
+                formData.config = fixitems(formData.config ?? []);
+            } else {
+                formData = {
+                    id: undefined,
+                    label: undefined,
+                    created_at: undefined,
+                    config: []
+                }
+            }
+            console.log("fetchForm",formData)
+            setForm(formData);
+        });
+    };
+    
+    useEffect(() => {
+        fetchForm(id);
+    }, [id]);
+    
+    const onChange = (value: FormType) => {
+        if (form) {
+            const v = clone_object<FormType>(value);
+            console.log("UPDATING FORM", v);
+            setForm(v);
+        } else {
+            console.log("UPDATING NO FORM");
+        }
+        
+        
+    };
+    
+    
     const [sidebarFieldsRegenKey, setSidebarFieldsRegenKey] = useState(
         Date.now()
     );
@@ -48,214 +82,124 @@ export default function Form({id}: {
     const currentDragFieldRef = useRef();
     const [activeSidebarField, setActiveSidebarField] = useState(); // only for fields from the sidebar
     const [activeField, setActiveField] = useState(); // only for fields that are in the form.
- 
-    const updateData = (r) => {
-        if (form){
-            const f = clone_object<FormType>(form)
-            f.config = r(f.config)
-            console.log("updateData",f.config);
-            setForm(f)
-        }
-       
-    }
     
-    const fetchForm = async (id: string) => {
-        await getForm(id).then((formData) => {
-            if (formData){
-                formData.config = fixitems(formData.config ?? [])
-            }
-            
-            setForm(formData)
-            // updateData(fixitems(formData?.config ?? []))
-        });
-    };
-    
-    
-    useEffect(() => {
-        fetchForm(id)
-        
-    }, [id])
-    
-    
-    
+    const [activeId, setActiveId] = useState(null);
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
     const cleanUp = () => {
         setActiveSidebarField(null);
         setActiveField(null);
         currentDragFieldRef.current = null;
         spacerInsertedRef.current = false;
     };
-    const handleDragStart = (e) => {
-        const {active} = e;
-        const activeData = getData(active);
-        
-        // This is where the cloning starts.
-        // We set up a ref to the field we're dragging
-        // from the sidebar so that we can finish the clone
-        // in the onDragEnd handler.
-        if (activeData.fromSidebar) {
-            const {field} = activeData;
-            const {type} = field;
-            setActiveSidebarField(field);
-            // Create a new field that'll be added to the fields array
-            // if we drag it over the canvas.
-            currentDragFieldRef.current = {
-                id: active.id,
-                type,
-                name: `${type}${items.length + 1}`,
-                parent: null,
-            };
-            return;
-        }
-        
-        // We aren't creating a new element so go ahead and just insert the spacer
-        // since this field already belongs to the canvas.
-        const {field, index} = activeData;
-        
-        setActiveField(field);
-        currentDragFieldRef.current = field;
-        updateData((draft) => {
-            draft.splice(index, 1, createSpacer({id: active.id}));
-            return draft
-        });
-    };
-    
-    const handleDragOver = (e) => {
-        const {active, over} = e;
-        const activeData = getData(active);
-        
-        // Once we detect that a sidebar field is being moved over the canvas
-        // we create the spacer using the sidebar fields id with a spacer suffix and add into the
-        // fields array so that it'll be rendered on the canvas.
-        
-        // 🐑 CLONING 🐑
-        // This is where the clone occurs. We're taking the id that was assigned to
-        // sidebar field and reusing it for the spacer that we insert to the canvas.
-        if (activeData.fromSidebar) {
-            const overData = getData(over);
-            
-            if (!spacerInsertedRef.current) {
-                const spacer = createSpacer({
-                    id: active.id + "-spacer",
-                });
-                
-                updateData((draft) => {
-                    if (!draft.length) {
-                        draft.push(spacer);
-                    } else {
-                        const nextIndex =
-                            overData.index > -1 ? overData.index : draft.length;
-                        
-                        draft.splice(nextIndex, 0, spacer);
-                    }
-                    spacerInsertedRef.current = true;
-                    return draft
-                });
-            } else if (!over) {
-                // This solves the issue where you could have a spacer handing out in the canvas if you drug
-                // a sidebar item on and then off
-                updateData((draft) => {
-                    draft = draft.filter((f) => f.type !== "spacer");
-                    return draft
-                });
-                spacerInsertedRef.current = false;
-            } else {
-                // Since we're still technically dragging the sidebar draggable and not one of the sortable draggables
-                // we need to make sure we're updating the spacer position to reflect where our drop will occur.
-                // We find the spacer and then swap it with the over skipping the op if the two indexes are the same
-                updateData((draft) => {
-                    const spacerIndex = draft.findIndex(
-                        (f) => f.id === active.id + "-spacer"
-                    );
-                    
-                    const nextIndex =
-                        overData.index > -1 ? overData.index : draft.length - 1;
-                    
-                    if (nextIndex === spacerIndex) {
-                        return;
-                    }
-                    
-                    draft = arrayMove(draft, spacerIndex, overData.index);
-                    return draft
-                });
-            }
-        }
-    };
-    
-    const handleDragEnd = (e) => {
-        const {over} = e;
-        
-        // We dropped outside of the over so clean up so we can start fresh.
-        if (!over) {
-            cleanUp();
-            updateData((draft) => {
-                draft = draft.filter((f) => f.type !== "spacer");
-                return draft
-            });
-            return;
-        }
-        
-        // This is where we commit the clone.
-        // We take the field from the this ref and replace the spacer we inserted.
-        // Since the ref just holds a reference to a field that the context is aware of
-        // we just swap out the spacer with the referenced field.
-        let nextField = currentDragFieldRef.current;
-        
-        if (nextField) {
-            const overData = getData(over);
-            
-            updateData((draft) => {
-                const spacerIndex = draft.findIndex((f) => f.type === "spacer");
-                draft.splice(spacerIndex, 1, nextField);
-                
-                draft = arrayMove(
-                    draft,
-                    spacerIndex,
-                    overData.index || 0
-                );
-                return draft
-            });
-        }
-        
-        setSidebarFieldsRegenKey(Date.now());
-        cleanUp();
-    };
-    
-    const handleItemsUpdate: HandleFormConfigOnChangeType = (new_config: FormType['config']) => {
-        
-        console.log("handleItemsUpdate",new_config);
-        if (form) {
-            const new_form: FormType = clone_object<FormType>(form);
-            new_form.config = new_config;
-            setForm(new_form);
-            console.log(new_form);
-        }
-    };
-    
-    console.log(form)
-    
-    
     return (
-        <div className="app">
-            <div className="content">
+        <>
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+            >
+                {form && <div className="grid">
+                    <div className="col-4">
+                        <Sidebar fieldsRegKey={sidebarFieldsRegenKey}></Sidebar>
+                    </div>
+                    <div className="col-8">
+                        <SortableContext
+                            items={form?.config ?? []}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <Canvas
+                                form={form}
+                                onChange={onChange}
+                            > </Canvas>
+                        
+                        </SortableContext>
+                        
+                    </div>
                 
-                {form &&
-                <DndContext
-                    onDragStart={handleDragStart}
-                    onDragOver={handleDragOver}
-                    onDragEnd={handleDragEnd}
-                    autoScroll
+                </div>}
+                <DragOverlay
+                    dropAnimation={null}
                 >
-                    <Sidebar/>
-                    <SortableContext
-                        strategy={verticalListSortingStrategy}
-                        items={form.config.map((f) => f.id)}
-                    >
-                        <Canvas items={form.config} onChange={handleItemsUpdate} />
-                    </SortableContext>
-                    <DragOverlay dropAnimation={false}>
-                    </DragOverlay>
-                </DndContext>}
-            </div>
-        </div>
+                
+                </DragOverlay>
+            </DndContext>
+        
+            <div>{JSON.stringify(form)}</div>
+        
+        </>
     );
+    
+    function handleDragStart(event) {
+        const {active} = event;
+        console.log(event)
+        console.log(active)
+        if (active?.data?.current?.fromSidebar){
+            const new_form = clone_object<FormType>(form);
+            const data: Item = active.data.current.item
+            data.default_config.id = nanoid()
+            new_form.config.push(data.default_config)
+            setForm(new_form)
+        }
+        
+    }
+    function handleDragOver(event) {
+        const {active, over} = event;
+        console.log(event)
+        console.log(active)
+        // if (active?.data?.current?.fromSidebar){
+        //     const new_form = clone_object<FormType>(form);
+        //     const data: Item = active.data.current.item
+        //     data.default_config.id = nanoid()
+        //     new_form.config.push(data.default_config)
+        //     setForm(new_form)
+        // }
+        
+    }
+    
+    function handleDragEnd(event) {
+        const {active, over} = event;
+        console.log("active",active,"over",over)
+        if (!form) {
+            return
+        }
+        if (active.data?.current?.fromSidebar) {
+            // console.log("handleDragEnd","from sidebar")
+            const data: Item = active.data.current.item
+            data.default_config.id = nanoid()
+            setSidebarFieldsRegenKey(Date.now())
+            
+            currentDragFieldRef.current = data
+            // const new_form = clone_object<FormType>(form);
+            // const newIndex = form.config.findIndex((item) => item['id'] === over.id);
+            //
+            // console.log("newIndex",newIndex)
+            // new_form.config.splice(newIndex+1,0, data.default_config)
+            
+            // setForm(new_form)
+        } else {
+            // console.log("** handleDragEnd **")
+            console.log(event)
+            // console.log("active", active, "over", over, "activeId", activeId)
+            if (form && (active.id !== over.id)) {
+                const oldIndex = form.config.findIndex((item) => item['id'] === active.id);
+                const newIndex = form.config.findIndex((item) => item['id'] === over.id);
+                const new_form = clone_object(form);
+                // console.log("oldIndex", oldIndex, "newIndex", newIndex)
+                new_form.config = arrayMove(form.config, oldIndex, newIndex)
+                setForm(new_form)
+            }
+            // console.log("clearing active", active)
+            setActiveId(null);
+            console.log("active id", activeId)
+            console.log("-- handleDragEnd --")
+        }
+    }
+    
 }

@@ -83,3 +83,14 @@ body {
     opacity: 0.25;
     height: 100px;
 }
+
+.drag-block {
+    position:relative;
+    
+}
+.drag-handle {
+    position: absolute;
+    left:0;
+    top:0;
+    bottom:0;
+}

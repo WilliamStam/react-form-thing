@@ -19,7 +19,7 @@ const itemConfig: SelectOptionInput = {
     type: "select",
     label: "",
     value: "",
-    options: []
+    options: [{label:"a",value:"A"}, {label: "b", value: "B"}]
 };
 
 const Render: React.FC<FieldComponentProps> = ({config, onChange}) => {

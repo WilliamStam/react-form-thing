@@ -1,30 +1,60 @@
-import {ItemType} from "@/objects/items.ts";
-import {useDroppable} from "@dnd-kit/core";
+import {FormType, HandleFormOnChangeType} from "@/objects/forms.ts";
+import {ItemType, HandleFieldOnChangeType} from "@/objects/items.ts";
+import {clone_object} from "@/utilities.ts";
+import {
+    closestCenter,
+    DndContext,
+    DragOverlay,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    useDroppable
+} from "@dnd-kit/core";
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
-import {useSortable} from "@dnd-kit/sortable";
-import {FormType} from "@/objects/forms.ts";
-import {Button} from "primereact/button";
-import {useState} from "react";
-import {renderers} from "./fields";
-import ItemBlock from "@/components/Item"
-import {HandleFieldOnChangeType} from "@/objects/items.ts";
-import {HandleFormConfigOnChangeType} from "@/objects/forms.ts";
+import {nanoid} from "nanoid";
+import React, {forwardRef, useEffect, useState} from "react";
+import ItemBlock from "@/components/Item.tsx";
 
-
-
-
-function SortableField({id,item, onChange}: {
+export const Item = forwardRef(({id, item, onChange, ...props}: {
     id: string,
     item: ItemType,
     onChange: HandleFieldOnChangeType
-}) {
-    // console.log("render SortableField",item)
+}, ref) => {
     
-    const {attributes, listeners, setNodeRef, transform, transition} =
-        useSortable({
-            id,
-            data: {item},
-        });
+    return (
+        <>
+        <div {...props} ref={ref} >
+            {item &&
+                <ItemBlock item={item} onChange={onChange} id={id}></ItemBlock>
+            }
+        </div>
+        </>
+    );
+});
+
+export function SortableItem({id, config, onChange}: {
+    id: string,
+    config: ItemType,
+    onChange: HandleFieldOnChangeType
+}) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({
+        id: id,
+        
+    });
     
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -33,64 +63,91 @@ function SortableField({id,item, onChange}: {
     
     return (
         <>
-            <div ref={setNodeRef} style={style} {...attributes}>
-                <div  >
-                    <div className="item-admin-buttons">
-                        <Button icon="pi pi-pencil" size="small" outlined/> <Button
-                        icon="pi pi-trash"
-                        size="small"
-                        outlined
-                    /> <Button icon="pi pi-arrows-v" size="small" outlined {...listeners}/>
-                    </div>
-                </div>
-                <ItemBlock item={item} onChange={onChange}></ItemBlock>
+            <div style={style} ref={setNodeRef} {...attributes} className="drag-block">
+                <button {...listeners} className="drag-handle">=</button>
+                <div style={{marginLeft:"40px"}}>{id}</div>
+                <Item onChange={onChange} item={config}></Item>
             </div>
         
         </>
     );
 }
 
-export default function Canvas({items, onChange}: {
-    items: ItemType[],
-    onChange: HandleFormConfigOnChangeType
+export default function Canvas({form, onChange}: {
+    form: FormType,
+    onChange: HandleFormOnChangeType
 }) {
-    // console.log("rendering Canvas");
-    const [items_list, setItems] = useState<ItemType[]>(items);
+    const [items, setItems] = useState<ItemType[]>(form?.config ?? []);
     
-    const {listeners, setNodeRef, transform, transition} = useDroppable({
+    useEffect(() => {
+        if (form && form.config && form.config != items){
+            console.log("resetting items", form, form.config, items)
+            setItems(form.config ?? []);
+        }
+    }, [form, items]);
+    //
+    // useEffect(() => {
+    //     // Update the document title using the browser API
+    //     console.log("watching it",items)
+    //     onChange(items)
+    // },[items]);
+    
+    
+    const handleFieldUpdate = (updatedField: ItemType, index: number) => {
+            if (form) {
+                const new_form = clone_object<FormType>(form)
+                const updatedData: ItemType[] = new_form.config;
+                updatedData[index] = updatedField;
+                new_form.config = updatedData
+                // form.config = updatedData
+                setItems(new_form.config)
+                onChange(new_form);
+                console.log("handleFieldUpdate", new_form)
+            }
+        };
+    
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition
+    } = useDroppable({
         id: "canvas_droppable",
         data: {
             parent: null,
-            isContainer: true,
-        },
+            isContainer: true
+        }
     });
     
     const style = {
         transform: CSS.Transform.toString(transform),
-        transition,
-    };
-    
-    
-    const handleFieldUpdate = (updatedField: ItemType, index: number) => {
-            const updatedData: ItemType[] = [...items];
-            updatedData[index] = updatedField;
-            // form.config = updatedData
-            onChange(updatedData);
-            console.log(updatedField, index)
+        transition
     };
     
     return (
-        <div ref={setNodeRef} className="canvas" style={style} {...listeners}>
-            <div className="canvas-fields">
-                {items.map((item, index) => (
-                    <SortableField
-                        key={index}
+        <>
+            <div
+                ref={setNodeRef}
+                className="canvas"
+                style={style}
+                {...attributes}
+                {...listeners}
+            >
+                <div className="canvas-fields">
+                    {items.map((item,index) => <SortableItem
+                        key={item.id}
+                        config={item}
                         id={item.id}
-                        item={item}
-                        onChange={(conf: ItemType) => handleFieldUpdate(conf, index)}
-                    />
-                ))}
+                        onChange={(value: ItemType) => handleFieldUpdate(value, index)}
+                    />)}
             </div>
-        </div>
+            </div>
+            
+                
+            
+        </>
     );
+    
+   
 }

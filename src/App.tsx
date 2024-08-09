@@ -12,7 +12,7 @@ library.add(fas,far)
 import TestForm from "@/components/testing/Form.tsx"
 
 export default function App() {
-    const [formId, setFormId] = useState<string>("1");
+    const [formId, setFormId] = useState<string>("new");
     const [isAdmin, setAdmin] = useState<boolean>(true);
     
    
