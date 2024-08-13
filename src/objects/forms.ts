@@ -1,9 +1,9 @@
 import {ItemType} from "@/objects/items.ts";
 
 export type FormType = {
-    id: number,
-    label: string,
-    created_at: string,
+    id: number | null,
+    label: string | null,
+    created_at: string | null,
     config: ItemType[]
 }
 export type HandleFormOnChangeType = (values: FormType) => void;

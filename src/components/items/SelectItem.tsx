@@ -41,7 +41,7 @@ const Render: React.FC<FieldComponentProps> = ({config, onChange}) => {
                         className={'w-full'}
                     > </Dropdown>
                 </label>
-                {/* <div className={"config-item"}>{JSON.stringify(data)}</div> */}
+                <div className={"config-item"}>{JSON.stringify(config)}</div>
             </article>
         
         

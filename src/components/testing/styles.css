@@ -63,7 +63,10 @@ body {
     max-height: 100%;
     overflow-y: auto;
 }
-
+.canvas div {
+    padding:5px;
+    border: 1px dotted #ccc;
+}
 .canvas-field {
     padding: 15px;
 }
@@ -85,12 +88,13 @@ body {
 }
 
 .drag-block {
-    position:relative;
+    position: relative;
     
 }
+
 .drag-handle {
     position: absolute;
-    left:0;
-    top:0;
-    bottom:0;
+    left: 0;
+    top: 0;
+    bottom: 0;
 }
