@@ -1,0 +1,48 @@
+.canvas {
+    
+    .sortable-item {
+        position: relative;
+        padding: 1rem 1rem 0 1rem;
+        border: 1px solid transparent;
+       
+        
+        .item-footer {
+            margin-top: 0rem;
+            visibility: hidden;
+            display: block;
+            .p-button {
+                border: none;
+            }
+            .item-type {
+                color: var(--primary-200);
+                font-size: 0.6rem;
+            }
+            
+        }
+        
+        &:hover {
+            background: var(--surface-c);
+            //border: 1px solid var(--primary-color);
+            
+            .drag-handle {
+                visibility: visible;
+            }
+            
+            .item-footer {
+                visibility: visible;
+            }
+        }
+        &.active {
+            //background: var(--surface-b);
+            border: 1px solid var(--primary-color);
+            //box-shadow: 0 0 1rem #e1e1e1;
+            .drag-handle {
+                visibility: visible;
+            }
+            
+            .item-footer {
+                visibility: visible;
+            }
+        }
+    }
+}

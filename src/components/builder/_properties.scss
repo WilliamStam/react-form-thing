@@ -1,0 +1,25 @@
+.properties-area {
+    .item-panel-item {
+        border: 1px solid transparent;
+        
+        .item-icon {
+            align-items: center;
+            
+            display: flex;
+            font-size: 1.5rem;
+            justify-content: center;
+            width: 3rem;
+            
+        }
+        
+        
+    }
+    
+    
+    border-left: 1px solid var(--surface-d);
+    
+    &.active {
+        border-left: 1px solid var(--primary-color);
+        
+    }
+}

@@ -21,6 +21,7 @@
     "primeflex": "^3.3",
     "primeicons": "^7.0",
     "primereact": "^10.8",
+    "quill": "^2.0.2",
     "react": "^18.3",
     "react-dom": "^18.3",
     "use-immer": "^0.10"

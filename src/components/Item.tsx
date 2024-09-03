@@ -1,17 +1,16 @@
 
-import items from "@/items.ts";
-import {HandleFieldOnChangeType, ItemType} from "@/objects/items.ts";
+import items from "@/components/items/items.ts";
+import {ItemType} from "@/objects/items.ts";
 import React, {useEffect, useState} from "react";
 
-const ItemBlock = ({item, onChange}: {
+const Item = ({item, ...rest}: {
     item: ItemType,
-    onChange: HandleFieldOnChangeType
 }) => {
     
-    if (typeof items[item.type] !== "undefined") {
-        return React.createElement(items[item.type].render, {
+    if (typeof items.getByItem(item) !== "undefined") {
+        return React.createElement(items.getByItem(item).form.render, {
             config: item,
-            onChange: onChange
+            ...rest
         });
     }
     // component doesn't exist yet
@@ -20,4 +19,13 @@ const ItemBlock = ({item, onChange}: {
     );
 };
 
+const ItemBlock = ({item, ...rest}: {
+    item: ItemType,
+}) => {
+    return (
+        <article className={`item item-block-${item.type}`}>
+            <Item item={item} {...rest}></Item>
+        </article>
+    )
+};
 export default ItemBlock;

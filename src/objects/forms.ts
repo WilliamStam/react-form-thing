@@ -8,3 +8,5 @@ export type FormType = {
 }
 export type HandleFormOnChangeType = (values: FormType) => void;
 export type HandleFormConfigOnChangeType = (values: ItemType[]) => void;
+
+export type FunctionFormType = (form: FormType) => void;

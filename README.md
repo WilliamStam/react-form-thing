@@ -27,3 +27,16 @@ Admin form component, pass in the id prop to it. this will render the form with 
 - [ ] remove items from form
 - [ ] forms panel show list of forms to be able to drag to the form
 - [ ] validation
+
+
+
+form icon
+
+
+datepicker
+html
+react-signature-canvas https://github.com/agilgur5/react-signature-canvas
+https://quilljs.com/
+
+checkbox lists (data)
+select box (data)

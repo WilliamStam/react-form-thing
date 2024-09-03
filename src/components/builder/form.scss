@@ -1,0 +1,31 @@
+
+.form-builder {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-areas:
+          "blocks canvas properties"
+          "output output output";
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 1fr auto;
+    height: calc(100vh - 3rem);
+    
+    .sidebar-area {
+        grid-area: blocks;
+        width: 20rem;
+    }
+    .properties-area {
+        grid-area: properties;
+        width: 25rem;
+    }
+    
+    .canvas-area {
+        grid-area: canvas;
+    }
+    
+    & > footer {
+        grid-area: output;
+    }
+    @import "sidebar";
+    @import "properties";
+    @import "canvas";
+}
