@@ -228,9 +228,7 @@ export default function Form({id}: {
                     collisionDetection={closestCenter}
                     autoScroll
                 >
-                    <div className="sidebar-area">
-                        <FormSidebar fieldsRegKey={sidebarFieldsRegenKey}/>
-                    </div>
+                    
                     <div className="canvas-area">
                         <SortableContext
                             strategy={rectSwappingStrategy}
@@ -238,18 +236,12 @@ export default function Form({id}: {
                         > <Canvas
                             form={form}
                             onFormChange={onFormChange}
-                            
                             activeItem={activeItem}
                             setActiveItem={handlerOnActiveItem}
                         /> </SortableContext>
                     </div>
-                    <div className={propertiesClassName}>
-                        <Properties
-                            form={form}
-                            activeItem={activeItem}
-                            setActiveItem={handlerOnActiveItem}
-                            onFormChange={onFormChange}
-                        />
+                    <div className="sidebar-area">
+                        <FormSidebar fieldsRegKey={sidebarFieldsRegenKey}/>
                     </div>
                     
                     <DragOverlay dropAnimation={null}>
