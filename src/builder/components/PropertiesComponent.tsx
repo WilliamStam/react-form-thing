@@ -1,6 +1,6 @@
-import items from "@/components/items/items.ts";
-import {FormType, HandleFormOnChangeType} from "@/objects/forms.ts";
-import {FunctionItemType, FunctionItemTypeNullable, ItemType} from "@/objects/items.ts";
+import items from "@/items/items.ts";
+import {FormType} from "@/objects/forms.ts";
+import {ItemType} from "@/objects/items.ts";
 import {clone_object} from "@/utilities.ts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Accordion, AccordionTab} from "primereact/accordion";
@@ -10,11 +10,11 @@ import React, {useEffect, useState} from "react";
 
 const ItemSettings = ({item, onChange}: {
     item: ItemType,
-    onChange: FunctionItemType
+    onChange: (item: ItemType) => void
 }) => {
-    
-    if (typeof items.getByItem(item) !== "undefined") {
-        return React.createElement(items.getByItem(item).settings.render, {
+    const item_object = items.getByItem(item)
+    if (item_object) {
+        return React.createElement(item_object.settings.render, {
             config: item,
             onChange: onChange
         });
@@ -26,16 +26,16 @@ const ItemSettings = ({item, onChange}: {
 };
 export default function PropertiesComponent({form, onFormChange, activeItem, setActiveItem}: {
     form: FormType,
-    onFormChange: HandleFormOnChangeType,
+    onFormChange: (form: FormType) => void,
     activeItem?: ItemType,
-    setActiveItem: FunctionItemTypeNullable,
+    setActiveItem: (item: ItemType | undefined) => void,
     
 }) {
     console.log("reloading PropertiesComponent");
     const [editing_form, setEditingForm] = useState(form);
     const [editing_item, setEditingItem] = useState(activeItem);
     
-    const handleFormItemChange: HandleFormOnChangeType = (value: ItemType) => {
+    const handleFormItemChange = (value: ItemType) => {
         console.log("handleFormItemChange", value);
         //
         setEditingItem(value);
@@ -56,8 +56,8 @@ export default function PropertiesComponent({form, onFormChange, activeItem, set
         onFormChange(updatedData);
     };
     
-    const handleCancel = (event: React.ChangeEvent<HTMLButtonElement>) => {
-        setActiveItem(null);
+    const handleCancel = () => {
+        setActiveItem(undefined);
     };
     
     console.log("activeItem", editing_item);
@@ -82,37 +82,43 @@ export default function PropertiesComponent({form, onFormChange, activeItem, set
     //     // onFormChange(new_form)
     // }, [item]);
     
-    const item = items.getByItem(editing_item);
     
     
-    if (editing_item && item) {
-        return (
-            <>
-                <div className="item-panel-item flex">
-                    <div className="item-icon mr-2">
-                        <FontAwesomeIcon icon={item.icon}/>
+    
+    if (editing_item) {
+        const item = items.getByItem(editing_item);
+        if (item){
+            return (
+                <>
+                    <div className="item-panel-item flex">
+                        <div className="item-icon mr-2">
+                            <FontAwesomeIcon icon={item.icon}/>
+                        </div>
+                        <div>
+                            <h2>{item.heading}</h2>
+                        </div>
                     </div>
-                    <div>
-                        <h2>{item.heading}</h2>
-                    </div>
-                </div>
-                
-                <ItemSettings item={editing_item} onChange={handleFormItemChange}></ItemSettings>
-                
-                <Button onClick={handleCancel} size="small" className={"w-full mt-5"}>Done</Button>
-            </>
+                    
+                    <ItemSettings item={editing_item} onChange={handleFormItemChange}></ItemSettings>
+                    
+                    <Button onClick={handleCancel} size="small" className={"w-full mt-5"}>Done</Button>
+                </>
+            );
+        }
+        return React.createElement(
+            () => <div>The component {editing_item.type} was not found.</div>,
         );
+        
     } else {
         return (
             <>
                 <div className="item-panel-item flex px-3">
-                   
+                    
                     <div>
                         <h1>Form Settings</h1>
                     </div>
                 </div>
-                <Accordion activeIndex={0}>
-                    <AccordionTab header="General" key="general">
+                <Accordion activeIndex={0}> <AccordionTab header="General" key="general">
                     <div className="form-item flex flex-column gap-4">
                         
                         <div className="flex flex-column gap-2">

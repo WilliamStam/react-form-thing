@@ -1,27 +1,25 @@
+import {Group} from "@/objects/groups.ts";
+import {IconProp} from "@fortawesome/fontawesome-svg-core";
 import React from "react";
-import {Group} from "@/objects/groups.ts"
+
+
 export type ItemType = {
     id: string;
     type: string;
-    [key: string]: any;
 }
 
 
 
-export type FunctionItemType = (value: ItemType) => void;
-export type FunctionItemTypeNullable = (value: ItemType | null) => void;
-export type FunctionItemIDType = (value: string) => void;
-export type ItemValidationFunctionType = (item: ItemType) => { [key: string]: string[] };
-
 export interface FieldComponentProps {
     config: ItemType;
-    onChange: FunctionItemType;
+    onChange: (value: ItemType) => void;
 }
 
 export class ItemRendererInit {
     constructor(
         public render: React.FC<FieldComponentProps>,
-        public validation: ItemValidationFunctionType
+        /* tslint:disable-next-line:no-any */
+        public validation: (item: any) => { [key: string]: string[] }
     ) {
     }
 }
@@ -31,20 +29,19 @@ export class ItemRenderer extends ItemRendererInit {
         super(
             init.render,
             init.validation,
-           
         );
     }
 }
+
 export class ItemInit {
     constructor(
         public form: ItemRenderer,
         public settings: ItemRenderer,
-        
         public type: string,
         public heading: string,
         public description: string,
         public hidden: boolean,
-        public icon: string,
+        public icon: IconProp,
         public default_config: ItemType,
         public group?: Group,
     ) {
@@ -89,12 +86,15 @@ export class ItemRegistry {
     }
     
     getByItem(item: ItemType): Item | undefined {
-        if (item) return this.items.find(it => it.type === item.type);
-        return undefined
+        if (item) {
+            return this.items.find(it => it.type === item.type);
+        }
+        return undefined;
     }
-    getByType(type: string): Item | undefined {
-        return this.items.find(item => item.type === type);
-    }
+    //
+    // getByType(type: string): Item | undefined {
+    //     return this.items.find(item => item.type === type);
+    // }
     
     * [Symbol.iterator]() {
         for (const item of this.items) {

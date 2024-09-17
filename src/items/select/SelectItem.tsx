@@ -1,10 +1,9 @@
-import {TextInputConfig} from "@/components/items/TextItem.tsx";
 import {FieldComponentProps, Item, ItemRenderer, ItemType} from "@/objects/items.ts";
 import {clone_object} from "@/utilities.ts";
 import {nanoid} from "nanoid";
 import {Accordion, AccordionTab} from "primereact/accordion";
 import {Button} from "primereact/button";
-import {Dropdown} from "primereact/dropdown";
+import {Dropdown, DropdownChangeEvent} from "primereact/dropdown";
 import {InputText} from "primereact/inputtext";
 import React, {useEffect, useState} from "react";
 
@@ -17,33 +16,40 @@ export type SelectOptionInput = ItemType & {
     label: string
     value: string
     options: SelectOptionType[]
+    placeholder: string
 }
 const itemConfig: SelectOptionInput = {
     id: nanoid(),
     type: "select",
     label: "",
     value: "",
-    options: [{label: "a", value: "A"}, {label: "b", value: "B"}]
+    options: [],
+    placeholder: ""
 };
 
 const FormComponent: React.FC<FieldComponentProps> = ({config, onChange}) => {
-    
-    const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const updatedData: TextInputConfig = {...{...itemConfig, ...config}, value: event.target.value};
+    const [item, setItem] = useState<SelectOptionInput>({...itemConfig, ...config});
+    useEffect(() => {
+        setItem({...itemConfig, ...config});
+    }, [config]);
+    const handleOnChange = (event: DropdownChangeEvent) => {
+        const updatedData: SelectOptionInput = {...{...itemConfig, ...config}, value: event.target.value};
         onChange(updatedData);
     };
+    
+    
     const id = Math.random().toString(36).substring(2, 15);
     return (
         <>
             <div className="flex flex-column gap-2">
-                <label htmlFor={id}>{config.label}</label>
+                <label htmlFor={id}>{item.label}</label>
                 <Dropdown
                     id={id}
-                    value={config.value || ""}
+                    value={item.value || ""}
                     onChange={handleOnChange}
-                    options={config.options}
+                    options={item.options}
                     showClear
-                    placeholder={config.placeholder || ""}
+                    placeholder={item.placeholder || ""}
                     className={"w-full"}
                 > </Dropdown>
             </div>
@@ -104,7 +110,7 @@ const SettingsEditOptionItem = ({option, onChange}: {
     );
 };
 const SettingsAddOptionItem = ({onInsert}: {
-    onInsert: (option: SelectOptionType | null) => void
+    onInsert: (option: SelectOptionType) => void
 }) => {
     const empty_data: SelectOptionType = {
         value: "",
@@ -124,6 +130,8 @@ const SettingsAddOptionItem = ({onInsert}: {
         onInsert({...{value: data.value, label: data.label}});
         setData(empty_data);
     };
+    
+    
     
     return (
         <>
@@ -159,13 +167,13 @@ const SettingsAddOptionItem = ({onInsert}: {
 const SettingsComponent: React.FC<FieldComponentProps> = ({config, onChange}) => {
     const [data, setData] = useState<SelectOptionInput>({...itemConfig, ...config});
     
-    const handleOnChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const updatedData: SelectOptionInput = {...data, [event.target.name]: event.target.value};
         setData(updatedData);
         onChange(updatedData);
     };
     
-    const handleOptionsOnChange = (option, index) => {
+    const handleOptionsOnChange = (option: SelectOptionType | null, index: number) => {
         const new_options = clone_object(data.options);
         if (option) {
             new_options[index] = option;
@@ -191,55 +199,55 @@ const SettingsComponent: React.FC<FieldComponentProps> = ({config, onChange}) =>
     
     return (
         <>
-         
-                <Accordion activeIndex={0}>
-                    <AccordionTab header="General" key="general">
-                    <div className="form-item flex flex-column gap-4">
-                        
-                        
-                        <div className="flex flex-column gap-2">
-                            <label htmlFor={"label"}>Label</label>
-                            <InputText
-                                id={"label"}
-                                value={data.label || ""}
-                                name={"label"}
-                                onChange={handleOnChange}
-                                className="w-full"
-                            />
-                        </div>
-                        <div className="flex flex-column gap-2">
-                            <label htmlFor={"placeholder"}>Placeholder</label>
-                            <InputText
-                                id={"placeholder"}
-                                value={data.placeholder || ""}
-                                name={"placeholder"}
-                                onChange={handleOnChange}
-                                className="w-full"
-                            />
-                        </div>
+            
+            <Accordion activeIndex={0}> <AccordionTab header="General" key="general">
+                <div className="form-item flex flex-column gap-4">
+                    
+                    
+                    <div className="flex flex-column gap-2">
+                        <label htmlFor={"label"}>Label</label>
+                        <InputText
+                            id={"label"}
+                            value={data.label || ""}
+                            name={"label"}
+                            onChange={handleOnChange}
+                            className="w-full"
+                        />
                     </div>
-                </AccordionTab> <AccordionTab header="Options" key="options">
-                    <div className="form-item flex flex-column gap-4">
-                        {data.options.map((item, index) => {
-                            return (<SettingsEditOptionItem
-                                key={`option-${index}`} option={item} onChange={(option) => {
-                                handleOptionsOnChange(option, index);
-                            }}
-                            />);
-                        })} <SettingsAddOptionItem
-                        key={`item-new`} onInsert={addNewOption}
-                    />
+                    <div className="flex flex-column gap-2">
+                        <label htmlFor={"placeholder"}>Placeholder</label>
+                        <InputText
+                            id={"placeholder"}
+                            value={data.placeholder || ""}
+                            name={"placeholder"}
+                            onChange={handleOnChange}
+                            className="w-full"
+                        />
                     </div>
-                </AccordionTab>
-                
-                </Accordion>
+                </div>
+            </AccordionTab> <AccordionTab header="Options" key="options">
+                <div className="form-item flex flex-column gap-4">
+                    {data.options.map((item, index) => {
+                        return (<SettingsEditOptionItem
+                            key={`option-${index}`} option={item} onChange={(option) => {
+                            handleOptionsOnChange(option, index);
+                        }}
+                        />);
+                    })} <SettingsAddOptionItem
+                    key={`item-new`} onInsert={addNewOption}
+                />
+                </div>
+            </AccordionTab>
+            
+            </Accordion>
             
             
-          
             {/* <div>{JSON.stringify(config)}</div> */}
         </>
     );
 };
+
+
 
 export default new Item({
     type: itemConfig.type,
@@ -247,17 +255,19 @@ export default new Item({
         render: FormComponent,
         validation: (item: SelectOptionInput) => {
             console.log(item);
+            return {}
         }
     }),
     settings: new ItemRenderer({
         render: SettingsComponent,
         validation: (item: SelectOptionInput) => {
             console.log(item);
+            return {}
         }
     }),
     heading: "Select box",
     description: "select from a list of items in a drop down",
     hidden: false,
-    icon: "fa-regular fa-square-caret-down",
+    icon: ["far", "square-caret-down"],
     default_config: itemConfig
 });

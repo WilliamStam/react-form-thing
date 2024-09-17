@@ -1,4 +1,5 @@
 import {FormType} from "@/objects/forms.ts";
+import {nanoid} from "nanoid";
 
 const data = [
     {
@@ -6,6 +7,7 @@ const data = [
         "label": "Daily checklist",
         "config": [
             {
+                "id": nanoid(),
                 "type": "select",
                 "options": [
                     {
@@ -21,6 +23,7 @@ const data = [
                 "value": "1"
             },
             {
+                "id": nanoid(),
                 "type": "form",
                 "form": 3,
                 "name": "sdefsdf"
@@ -28,64 +31,23 @@ const data = [
         ],
         "created_at": "2024-07-08T16:01:02"
     },
-    {
-        "id": 1,
-        "label": "Hammer",
-        "config": [
-            {
-                "type": "text",
-                "label": "Name"
-            },
-            {
-                "type": "select",
-                "options": [
-                    {
-                        "value": "s",
-                        "label": "Small"
-                    },
-                    {
-                        "value": "m",
-                        "label": "Medium"
-                    }
-                ],
-                "label": "Size"
-            },
-            {
-                "type": "select",
-                "options": [
-                    {
-                        "value": "red",
-                        "label": "red"
-                    },
-                    {
-                        "value": "green",
-                        "label": "green"
-                    },
-                    {
-                        "value": "blue",
-                        "label": "blue"
-                    }
-                ],
-                "name": "Colour",
-                "label": "Colour"
-            },
-            {
-                "type": "text",
-                "name": "Whats your name",
-                "label": "Whats your name"
-            }
-        ],
-        "created_at": "2024-07-01T17:08:44"
-    },
+    
     {
         "id": 2,
         "label": "Screwdriver",
         "config": [
             {
+                "id": nanoid(),
                 "type": "text",
                 "label": "Name"
             },
             {
+                "id": nanoid(),
+                "type": "date",
+                "label": "Name"
+            },
+            {
+                "id": nanoid(),
                 "type": "select",
                 "options": [
                     {
@@ -107,14 +69,17 @@ const data = [
         "label": "Toolbox",
         "config": [
             {
+                "id": nanoid(),
                 "type": "text",
                 "label": "Name"
             },
             {
+                "id": nanoid(),
                 "type": "form",
                 "form": 1
             },
             {
+                "id": nanoid(),
                 "type": "form",
                 "form": 2
             }
@@ -124,11 +89,6 @@ const data = [
 ]
 
 
-
-export async function getForms(): Promise<FormType[]> {
-    return data;
-}
-
-export async function getForm(id?: string): Promise<FormType | undefined> {
+export function getForm(id?: string): FormType | undefined {
     return data.find((item) => item.id.toString() === id);
 }

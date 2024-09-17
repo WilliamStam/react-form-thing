@@ -6,7 +6,3 @@ export type FormType = {
     created_at: string | null,
     config: ItemType[]
 }
-export type HandleFormOnChangeType = (values: FormType) => void;
-export type HandleFormConfigOnChangeType = (values: ItemType[]) => void;
-
-export type FunctionFormType = (form: FormType) => void;

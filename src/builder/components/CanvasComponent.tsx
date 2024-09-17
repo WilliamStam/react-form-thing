@@ -1,25 +1,24 @@
-import {FormType, FunctionFormType, HandleFormOnChangeType} from "@/objects/forms.ts";
-import {FunctionItemType, FunctionItemIDType, ItemType, FunctionItemTypeNullable} from "@/objects/items.ts";
+import {FormType} from "@/objects/forms.ts";
+import {ItemType} from "@/objects/items.ts";
+import ItemBlock from "@/render/Item.tsx";
 import {clone_object} from "@/utilities.ts";
 import {useDroppable} from "@dnd-kit/core";
-import {CSS} from "@dnd-kit/utilities";
 import {useSortable} from "@dnd-kit/sortable";
+import {CSS} from "@dnd-kit/utilities";
+import {Button} from "primereact/button";
+import {ButtonGroup} from "primereact/buttongroup";
 
-import ItemBlock from "@/components/Item.tsx";
-import React, {useEffect, useState} from "react";
-import {Button} from 'primereact/button';
-import {ButtonGroup} from 'primereact/buttongroup';
-
-import {confirmDialog, ConfirmDialog} from 'primereact/confirmdialog';
+import {confirmDialog} from "primereact/confirmdialog";
+import {useEffect, useState} from "react";
 
 
 export function SortableItem({id, config, active, setActive, onItemChange, onItemRemove}: {
     id: string,
     config: ItemType,
     active?: ItemType,
-    setActive: FunctionItemType,
-    onItemChange: FunctionItemType
-    onItemRemove: FunctionItemIDType
+    setActive: (item: ItemType | undefined) => void,
+    onItemChange: (item: ItemType) => void
+    onItemRemove: (id: string) => void
 }) {
     
     const {attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition} =
@@ -27,7 +26,7 @@ export function SortableItem({id, config, active, setActive, onItemChange, onIte
             id,
             data: {
                 id,
-                item:config,
+                item: config,
             },
             
         });
@@ -37,96 +36,102 @@ export function SortableItem({id, config, active, setActive, onItemChange, onIte
         transition,
     };
     
-    let className = "sortable-item"
-    if (config.id == active?.id){
-        className = className + " active"
+    let className = "sortable-item";
+    if (config.id == active?.id) {
+        className = className + " active";
     }
     
     
     const confirm = () => {
         confirmDialog({
-            message: 'Are you sure you want to remove this item?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
+            message: "Are you sure you want to remove this item?",
+            header: "Confirmation",
+            icon: "pi pi-exclamation-triangle",
             accept: () => onItemRemove(id),
             // reject: () => rejectFunc()
         });
-    }
-    let editBtn = <Button size="small" outlined label="Edit" icon="pi pi-pencil" onClick={() => setActive(config)}/>
+    };
+    let editBtn = <Button size="small" outlined label="Edit" icon="pi pi-pencil" onClick={() => setActive(config)}/>;
     if (active && active.id == config.id) {
-        editBtn = <Button size="small" outlined label="Done" icon="pi pi-pencil" onClick={() => setActive(null)}/>
+        editBtn = <Button size="small" outlined label="Done" icon="pi pi-pencil" onClick={() => setActive(undefined)}/>;
     }
+   
     return (
-        <div ref={setNodeRef} style={style} {...attributes} className={className} >
-           
+        <>
+        <div ref={setNodeRef} style={style} {...attributes} className={className}>
+            
             <ItemBlock item={config} onChange={onItemChange}/>
             
             <div className="flex flex-row align-items-center item-footer">
                 <div className="flex-grow-1 item-type"> {config.type}</div>
-               
-                <ButtonGroup >
-                    <Button {...listeners} ref={setActivatorNodeRef} size="small" outlined label="Order" icon="pi pi-sort" />
+                
+                <ButtonGroup>
+                    <Button {...listeners}
+                        // @ts-ignore
+                        ref={setActivatorNodeRef}
+                        size="small"
+                        outlined
+                        label="Order"
+                        icon="pi pi-sort"
+                    />
                     
                     {editBtn}
                     
-                    <Button size="small" outlined label="Remove" icon="pi pi-trash" onClick={confirm}/>
-                </ButtonGroup>
+                    <Button size="small" outlined label="Remove" icon="pi pi-trash" onClick={confirm}/> </ButtonGroup>
             </div>
-            
-            
+        
+        
         </div>
+        </>
     );
 }
 
 export default function CanvasComponent({form, onFormChange, activeItem, setActiveItem}: {
     form: FormType,
-    onFormChange: FunctionFormType,
+    onFormChange: (form: FormType) => void,
     activeItem?: ItemType,
-    setActiveItem: FunctionItemTypeNullable,
+    setActiveItem: (item: ItemType | undefined) => void,
     
 }) {
-    console.log("reloading CanvasComponent")
+    console.log("reloading CanvasComponent");
     const [items, setItems] = useState<ItemType[]>(form?.config ?? []);
     
     useEffect(() => {
         if (form && form.config && form.config != items) {
-            console.log("resetting items", form, form.config, items)
+            console.log("resetting items", form, form.config, items);
             setItems(form.config ?? []);
         }
     }, [form]);
     
     
-    
     const handleItemRemove = (item_id: string) => {
         
-        const new_form = clone_object(form)
+        const new_form = clone_object(form);
         new_form.config = new_form.config.filter(it =>
             it.id != item_id
         );
-        onFormChange(new_form)
-        if (activeItem && activeItem.id == item_id){
-            setActiveItem(null)
+        onFormChange(new_form);
+        if (activeItem && activeItem.id == item_id) {
+            setActiveItem(undefined);
         }
         
-    }
-    
-    const handleItemChange: HandleFormOnChangeType = (value) => {
-        const new_items: ItemType[] = items.map((item: ItemType) => {
-            if (item.id == value.id) {
-                return value
-            }
-            return item
-        })
-        setItems(new_items)
-        
-        const new_form = clone_object<FormType>(form)
-        new_form.config = new_items
-        onFormChange(new_form)
     };
     
+    const handleItemChange = (value: ItemType) => {
+        const new_items: ItemType[] = items.map((item: ItemType) => {
+            if (item.id == value.id) {
+                return value;
+            }
+            return item;
+        });
+        setItems(new_items);
+        
+        const new_form = clone_object<FormType>(form);
+        new_form.config = new_items;
+        onFormChange(new_form);
+    };
     
-    
-    
+    // @ts-ignore
     const {listeners, setNodeRef, transform, transition} = useDroppable({
         id: "canvas_droppable",
         data: {
@@ -142,7 +147,7 @@ export default function CanvasComponent({form, onFormChange, activeItem, setActi
     
     return (
         <div ref={setNodeRef} className="canvas p-4" style={style} {...listeners}>
-            {items?.map((item, index) => (
+            {items?.map((item) => (
                 <SortableItem
                     key={item.id}
                     id={item.id}

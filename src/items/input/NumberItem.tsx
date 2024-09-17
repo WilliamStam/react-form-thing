@@ -1,14 +1,13 @@
-import {DateInputConfig} from "@/components/items/input/DateItem.tsx";
-import {FieldComponentProps, Item, ItemType, ItemRenderer} from "@/objects/items.ts";
+import {FieldComponentProps, Item, ItemRenderer, ItemType} from "@/objects/items.ts";
 import {nanoid} from "nanoid";
+import {Accordion, AccordionTab} from "primereact/accordion";
 import {InputText} from "primereact/inputtext";
 import React, {useEffect, useState} from "react";
-import {render} from "sass";
-import {InputGroup} from "@/components/items/groups.ts"
-import {Accordion, AccordionTab} from "primereact/accordion";
+
 export type TextNumberInputConfig = ItemType & {
     label: string
     value: string
+    placeholder: string
 }
 
 const itemConfig: TextNumberInputConfig = {
@@ -16,10 +15,11 @@ const itemConfig: TextNumberInputConfig = {
     type: "text-number",
     label: "",
     value: "",
+    placeholder: ""
 };
 
 const FormComponent: React.FC<FieldComponentProps> = ({config, onChange}) => {
-    const [item, setItem] = useState<DateInputConfig>({...itemConfig, ...config});
+    const [item, setItem] = useState<TextNumberInputConfig>({...itemConfig, ...config});
     useEffect(() => {
         setItem({...itemConfig, ...config});
     }, [config]);
@@ -33,17 +33,17 @@ const FormComponent: React.FC<FieldComponentProps> = ({config, onChange}) => {
     
     return (
         <>
-                <div className="flex flex-column gap-2">
-                    <label htmlFor={id}>{config.label}</label>
-                    <InputText
-                        type={"number"}
-                        value={item.value}
-                        onChange={handleOnChange}
-                        placeholder={item.placeholder || ""}
-                        className="w-full"
-                        id={id}
-                    ></InputText>
-                </div>
+            <div className="flex flex-column gap-2">
+                <label htmlFor={id}>{item.label}</label>
+                <InputText
+                    type={"number"}
+                    value={item.value}
+                    onChange={handleOnChange}
+                    placeholder={item.placeholder || ""}
+                    className="w-full"
+                    id={id}
+                ></InputText>
+            </div>
         </>
     );
 };
@@ -97,15 +97,21 @@ export default new Item({
     type: itemConfig.type,
     form: new ItemRenderer({
         render: FormComponent,
-        validation: (item: TextNumberInputConfig)=>{console.log(item)}
+        validation: (item: TextNumberInputConfig) => {
+            console.log(item);
+            return {}
+        }
     }),
     settings: new ItemRenderer({
         render: SettingsComponent,
-        validation: (item: TextNumberInputConfig)=>{console.log(item)}
+        validation: (item: TextNumberInputConfig) => {
+            console.log(item);
+            return {}
+        }
     }),
     heading: "Number input",
     description: "a simple box to insert a number value into",
     hidden: false,
-    icon: "fa-solid fa-7",
+    icon: ["fas", "7"],
     default_config: itemConfig
 });
