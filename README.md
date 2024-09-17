@@ -40,3 +40,5 @@ https://quilljs.com/
 
 checkbox lists (data)
 select box (data)
+
+npm install https://github.com/WilliamStam/react-form-thing@v0.0.1
